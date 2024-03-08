@@ -1,5 +1,6 @@
 import asyncio
 import os
+from sys import stdout
 
 from objects.base_object import BaseObject
 from objects.void_object import VoidObject
@@ -18,9 +19,10 @@ class Screen:
         """
         Prints a frame of the screen
         """
-        os.system('cls' if os.name == 'nt' else 'clear')
-        for r in self.data:
-            print(' '.join(map(lambda x: x.appearance, r)))
+        string = '\n'.join([' '.join([c.appearance for c in r]) for r in self.data])
+        mult = '\033[A' * self.height
+        stdout.write(f"{mult}\r{string}")
+        stdout.flush()
 
     def set_obj(self, x: int, y: int, obj: BaseObject) -> bool:
         """
@@ -57,6 +59,7 @@ class Screen:
         Constantly renders frames.
         Awaits sleep every time.
         """
+        os.system('cls')
         while True:
             self.render_frame()
             await asyncio.sleep(0.01)
