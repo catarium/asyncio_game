@@ -1,6 +1,8 @@
 # Asyncio game
 A terminal-based game that runs in a single thread, creating the illusion of simultaneous graphics output and input processing, using asyncio.
 
+![demo](https://github.com/catarium/asyncio_game/blob/main/demo.gif?raw=true)
+
 ## Running
 
 ### 1. Install python
