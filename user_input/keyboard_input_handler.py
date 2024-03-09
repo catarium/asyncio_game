@@ -36,4 +36,5 @@ class KeyboardInputHandler:
                         await data[0](*data[1])
                     else:
                         data[0](*data[1])
-            await asyncio.sleep(0.03)
+                    await asyncio.sleep(0.01)
+            await asyncio.sleep(0.04)

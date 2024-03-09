@@ -1,4 +1,7 @@
 import asyncio
+
+from enemy_manager.enemy_spawner import enemy_spawner
+from objects.enemy_object import EnemyObject
 from objects.player_object import PlayerObject
 from screen.screen import Screen
 from user_input.keyboard_input_handler import KeyboardInputHandler
@@ -14,12 +17,14 @@ keyboard_input_handler.add_handler('up', player.move_up, [])
 keyboard_input_handler.add_handler('down', player.move_down, [])
 keyboard_input_handler.add_handler('right', player.move_right, [])
 keyboard_input_handler.add_handler('left', player.move_left, [])
+keyboard_input_handler.add_handler('space', player.shoot, [])
 
 
 async def main():
     await asyncio.gather(
-        screen.start_show(),
-        keyboard_input_handler.start_listening()
+        screen.start_show(player),
+        keyboard_input_handler.start_listening(),
+        enemy_spawner([EnemyObject, EnemyObject], screen)
     )
 
 
