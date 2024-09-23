@@ -1,8 +1,9 @@
 import asyncio
 import inspect
-import keyboard
 import typing
+import pynput
 from typing import Union
+import platform
 
 
 class KeyboardInputHandler:
@@ -12,7 +13,7 @@ class KeyboardInputHandler:
     def __init__(self, handlers: dict = {}):
         self.handlers = handlers
 
-    def add_handler(self, key: Union[str, keyboard.KeyboardEvent],
+    def add_handler(self, key: str,
                     handler: Union[typing.Callable, typing.Awaitable],
                     args: typing.Union[tuple, list]) -> None:
         """
@@ -23,11 +24,29 @@ class KeyboardInputHandler:
         """
         self.handlers[key] = (handler, args)
 
-    async def start_listening(self) -> None:
+    async def linux_listener(self):
         """
         Starts checking if the keys are pressed. If so, calls or awaits handler function.
         Awaits sleep after every check.
         """
+        with pynput.keyboard.Events() as events:
+            while True:
+                event = events.get(0.01)
+                for k in self.handlers:
+                    data = self.handlers[k]
+                    if event and k in str(event.key):
+                        if inspect.iscoroutinefunction(data[0]):
+                            await data[0](*data[1])
+                        else:
+                            data[0](*data[1])
+                    await asyncio.sleep(0.01)
+
+    async def windows_listener(self):
+        """
+        Starts checking if the keys are pressed. If so, calls or awaits handler function.
+        Awaits sleep after every check.
+        """
+        import keyboard
         while True:
             for k in self.handlers:
                 data = self.handlers[k]
@@ -38,3 +57,15 @@ class KeyboardInputHandler:
                         data[0](*data[1])
                     await asyncio.sleep(0.01)
             await asyncio.sleep(0.04)
+
+
+    async def start_listening(self) -> None:
+        """
+        Runs a listener according to os
+        """
+
+        # Using special version of listener for winodws bc keyboard module works better, but requires root on linux
+        if platform.system == 'Windows':
+            await self.windows_listener()
+        await self.linux_listener()
+        
