@@ -67,5 +67,6 @@ class KeyboardInputHandler:
         # Using special version of listener for winodws bc keyboard module works better, but requires root on linux
         if platform.system == 'Windows':
             await self.windows_listener()
+            return
         await self.linux_listener()
         
