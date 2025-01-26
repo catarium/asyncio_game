@@ -1,5 +1,2 @@
-evdev==1.8.0
 keyboard==0.13.5
 pynput==1.7.7
-python-xlib==0.33
-six==1.17.0
