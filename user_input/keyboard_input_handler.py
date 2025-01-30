@@ -34,7 +34,7 @@ class KeyboardInputHandler:
                 event = events.get(0.01)
                 for k in self.handlers:
                     data = self.handlers[k]
-                    if event and k in str(event.key):
+                    if event and k in str(event.key) and isinstance(event, pynput.keyboard.Events.Press):
                         if inspect.iscoroutinefunction(data[0]):
                             await data[0](*data[1])
                         else:
