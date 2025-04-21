@@ -30,6 +30,7 @@ class PlayerObject(BaseObject):
         return self.symb
 
     def kill(self):
+        self.screen.end_game()
         self.alive = False
 
     async def shoot(self):

@@ -5,6 +5,7 @@ from sys import stdout
 from objects.base_object import BaseObject
 from objects.block_object import BlockObject
 from objects.enemy_object import EnemyObject
+from objects.home_object import HomeObject
 from objects.missile_object import MissileObject
 from objects.player_object import PlayerObject
 from objects.self_guided_missile_object import SelfGuidedMissileObject
@@ -16,9 +17,13 @@ class Screen:
     Shows screen
     """
     def __init__(self, height: int, width: int):
+        self.alive = True
         self.height = height
         self.width = width
+        self.counter = 0
         self.data = [[VoidObject(j, i) for j in range(width)] for i in range(height)]
+        for i in range(1, width - 1):
+            self.data[height - 2][i] = HomeObject(self, i, height - 2)
         for y in range(height):
             self.data[y][0] = BlockObject(self, 0, y)
             self.data[y][width - 1] = BlockObject(self, width - 1, y)
@@ -30,7 +35,7 @@ class Screen:
         """
         Prints a frame of the screen
         """
-        string = '\n'.join([' '.join([c.appearance for c in r]) for r in self.data])
+        string = f'Enemies killed: {self.counter}\n' + '\n'.join([' '.join([c.appearance for c in r]) for r in self.data])
         mult = '\033[A' * self.height
         stdout.write(f"{mult}\r{string}")
         stdout.flush()
@@ -83,7 +88,17 @@ class Screen:
             self.data[y][x].kill()
             self.set_obj(obj.x, obj.y, VoidObject(obj.x, obj.y))
             self.set_obj(x, y, VoidObject(x, y))
+            self.counter += 1
             res = True
+        elif (isinstance(obj, EnemyObject) and isinstance(self.data[y][x], PlayerObject)) or (isinstance(obj, PlayerObject) and isinstance(self.data[y][x], EnemyObject)): # player and enemy
+            obj.kill()
+            self.data[y][x].kill()
+            self.set_obj(obj.x, obj.y, VoidObject(obj.x, obj.y))
+            self.set_obj(x, y, VoidObject(x, y))
+            res = True
+        elif isinstance(obj, EnemyObject) and isinstance(self.data[y][x], HomeObject): # enemy and block
+            self.data[y][x].kill()
+            return False
         elif isinstance(obj, PlayerObject) and isinstance(self.data[y][x], BlockObject): # block and player
             return False
         elif isinstance(obj, EnemyObject) or isinstance(self.data[y][x], EnemyObject): # enemy and block
@@ -98,13 +113,16 @@ class Screen:
             res = False
         return res
 
+    def end_game(self):
+        self.alive = False
+
     async def start_show(self, player):
         """
         Constantly renders frames.
         Awaits sleep every time.
         """
         os.system('cls' if os.name == 'nt' else 'clear')
-        while player.alive:
+        while self.alive:
             self.render_frame()
             await asyncio.sleep(0.01)
         os.system('cls' if os.name == 'nt' else 'clear')
