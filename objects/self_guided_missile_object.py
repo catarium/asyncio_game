@@ -47,4 +47,4 @@ class SelfGuidedMissileObject(BaseObject):
     async def start_acting(self):
         while self.alive:
             self.make_step()
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.06)

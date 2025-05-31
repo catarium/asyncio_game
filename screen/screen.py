@@ -90,6 +90,15 @@ class Screen:
             self.set_obj(x, y, VoidObject(x, y))
             self.counter += 1
             res = True
+
+        elif (isinstance(obj, SelfGuidedMissileObject) and isinstance(self.data[y][x], MissileObject)) or (
+                isinstance(obj, MissileObject) and isinstance(self.data[y][x], SelfGuidedMissileObject)): # between missiles and enemy
+            obj.kill()
+            self.data[y][x].kill()
+            self.set_obj(obj.x, obj.y, VoidObject(obj.x, obj.y))
+            self.set_obj(x, y, VoidObject(x, y))
+            self.counter += 1
+            res = True
         elif (isinstance(obj, EnemyObject) and isinstance(self.data[y][x], PlayerObject)) or (isinstance(obj, PlayerObject) and isinstance(self.data[y][x], EnemyObject)): # player and enemy
             obj.kill()
             self.data[y][x].kill()

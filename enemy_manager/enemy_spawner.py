@@ -10,9 +10,9 @@ async def enemy_spawner(enemies, screen):
     """
     while True:
         shuffle(enemies)
-        for enemy_class in enemies:
+        for enemy in enemies:
             cords = (randrange(1, screen.width - 1), 1)
-            enemy = enemy_class(screen, *cords)
+            enemy = enemy[0](screen, *cords, *enemy[1])
             asyncio.create_task(enemy.start_acting())
             screen.set_obj(cords[0], cords[1], enemy)
             await asyncio.sleep(0.02)

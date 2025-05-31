@@ -3,6 +3,7 @@ import asyncio
 from enemy_manager.enemy_spawner import enemy_spawner
 from objects.enemy_object import EnemyObject
 from objects.player_object import PlayerObject
+from objects.self_guided_missile_object import SelfGuidedMissileObject
 from screen.screen import Screen
 from user_input.keyboard_input_handler import KeyboardInputHandler
 
@@ -10,7 +11,7 @@ from user_input.keyboard_input_handler import KeyboardInputHandler
 # initializing a screen, input handler and player
 screen = Screen(21, 21)
 keyboard_input_handler = KeyboardInputHandler()
-player = PlayerObject(screen, 10, 10)
+player = PlayerObject(screen, 10, 18)
 
 # binding key pressing events
 keyboard_input_handler.add_handler('up', player.move_up, [])
@@ -24,7 +25,7 @@ async def main():
     await asyncio.gather(
         screen.start_show(player),
         keyboard_input_handler.start_listening(),
-        enemy_spawner([EnemyObject, EnemyObject], screen)
+        enemy_spawner([(EnemyObject, []), (EnemyObject, []), (SelfGuidedMissileObject, (player,))], screen)
     )
 
 
